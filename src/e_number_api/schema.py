@@ -1,5 +1,5 @@
 import graphene
-import api
+import api.schema
 
 
 class Query(api.schema.Query, graphene.ObjectType):
