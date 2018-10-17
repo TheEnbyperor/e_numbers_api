@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_number_api.settings")
 django.setup()
 
 # your imports, e.g. Django models
-from api.models import Category, SubCategory, SubCategoryMoreInfo
+from src.api.models import Category, SubCategory, SubCategoryMoreInfo
 
 base_url = "https://en.wikipedia.org"
 

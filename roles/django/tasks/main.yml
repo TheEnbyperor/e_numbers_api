@@ -1,0 +1,92 @@
+---
+- name: Create folder
+  file:
+    path: /opt/apps/enumapu
+    state: directory
+  run_once: true  
+    
+- name: Create venv
+  shell: "python3 -m virtualenv /opt/apps/enumapi/env"
+  run_once: true
+
+- name: Copy files
+  synchronize:
+    src: src
+    dest: /opt/apps/enumapi/
+    rsync_opts:
+    - "--exclude=db.sqlite3"
+    - "--exclude=media"
+    - "--exclude=static"
+  run_once: true
+  
+- name: Copy db password
+  template:
+    src: templates/db_pass.j2
+    dest: /opt/apps/enumapi/src/db_pass
+    owner: www-data
+    group: www-data
+    mode: 0640
+  run_once: true
+
+- name: Copy secret
+  template:
+    src: templates/secret.j2
+    dest: /opt/apps/enumapi/src/secret
+    owner: www-data
+    group: www-data
+    mode: 0640
+  run_once: true
+  
+- name: Create db
+  mysql_db:
+    name: enumapi
+    state: present
+  run_once: true
+  
+- name: Create db user
+  mysql_user:
+    name: enumapi
+    host: "%"
+    state: present
+    password: "{{ db_pass}}"
+    priv: "enumapi.*:ALL"
+  run_once: true
+  
+- name: Install dependencies
+  pip:
+    requirements: /opt/apps/enumapi/src/requirements.txt
+    state: present
+    virtualenv: /opt/apps/enumapi/env
+  run_once: true
+
+- name: Migrate database
+  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/chf_website/src/manage.py migrate"
+  run_once: true  
+
+- name: Collect static 
+  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/chf_website/src/manage.py collectstatic --noinput"
+  run_once: true
+
+- name: Create uWSGI config
+  file:
+    path: /etc/uwsgi/vassals/enumapi.ini
+    src: /etc/uwsgi/vassals/app.skel
+    state: link
+    
+- name: Create nginx config
+  copy:
+    src: files/nginx
+    dest: /etc/nginx/sites-enabled/enumapi
+
+- name: Issue certificates
+  shell: "certbot -m {{ letsencrypt_email }} --agree-tos --nginx -d enumapi.misell.cymru -n certonly"
+  args:
+    creates: /etc/letsencrypt/live/enumapi.misell.cymru
+    
+- name: Reload nginx
+  service:
+    name: nginx
+    state: reloaded
+    
+- name: Reload vassal
+  command: "touch --no-dereference /etc/uwsgi/vassals/enumapi.ini"

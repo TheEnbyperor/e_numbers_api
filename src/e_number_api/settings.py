@@ -19,13 +19,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
+with open(os.path.join(BASE_DIR, "secret")) as f:
+    secret = f.read()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'w%h3tmsb$0=-#y%90()*v%2u)^f+08lhxhj*h!_7d0p#2j!n!n'
+SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['enumapi.misell.cymru']
 
 
 # Application definition
@@ -56,7 +59,7 @@ ROOT_URLCONF = 'e_number_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
+        'DIRS': [os.path.join(BASE_DIR, '../../templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -76,13 +79,19 @@ WSGI_APPLICATION = 'e_number_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+with open(os.path.join(BASE_DIR, "db_pass")) as f:
+    db_pass = f.read()
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.getenv('DB_NAME', 'enumapi'),
+        'USER': os.getenv('DB_USER', 'enumapi'),
+        'PASSWORD': db_pass,
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'ENGINE': 'django.db.backends.mysql',
+        'PORT': '',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
