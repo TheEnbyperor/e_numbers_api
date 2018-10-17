@@ -27,6 +27,7 @@ class SubCategory(models.Model):
 class Substance(models.Model):
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='substances')
     name = models.CharField(max_length=255)
+    e_number = models.PositiveIntegerField()
     more_info = models.URLField()
 
     def __str__(self):
