@@ -1,18 +1,18 @@
 ---
 - name: Create folder
   file:
-    path: /opt/apps/enumapu
+    path: /opt/apps/e_number_api
     state: directory
   run_once: true  
     
 - name: Create venv
-  shell: "python3 -m virtualenv /opt/apps/enumapi/env"
+  shell: "python3 -m virtualenv /opt/apps/e_number_api/env"
   run_once: true
 
 - name: Copy files
   synchronize:
     src: src
-    dest: /opt/apps/enumapi/
+    dest: /opt/apps/e_number_api/
     rsync_opts:
     - "--exclude=db.sqlite3"
     - "--exclude=media"
@@ -22,7 +22,7 @@
 - name: Copy db password
   template:
     src: templates/db_pass.j2
-    dest: /opt/apps/enumapi/src/db_pass
+    dest: /opt/apps/e_number_api/src/db_pass
     owner: www-data
     group: www-data
     mode: 0640
@@ -31,7 +31,7 @@
 - name: Copy secret
   template:
     src: templates/secret.j2
-    dest: /opt/apps/enumapi/src/secret
+    dest: /opt/apps/e_number_api/src/secret
     owner: www-data
     group: www-data
     mode: 0640
@@ -39,37 +39,37 @@
   
 - name: Create db
   mysql_db:
-    name: enumapi
+    name: e_number_api
     state: present
   run_once: true
   
 - name: Create db user
   mysql_user:
-    name: enumapi
+    name: e_number_api
     host: "%"
     state: present
     password: "{{ db_pass}}"
-    priv: "enumapi.*:ALL"
+    priv: "e_number_api.*:ALL"
   run_once: true
   
 - name: Install dependencies
   pip:
-    requirements: /opt/apps/enumapi/src/requirements.txt
+    requirements: /opt/apps/e_number_api/src/requirements.txt
     state: present
-    virtualenv: /opt/apps/enumapi/env
+    virtualenv: /opt/apps/e_number_api/env
   run_once: true
 
 - name: Migrate database
-  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/enumapi/src/manage.py migrate"
+  command: "/opt/apps/e_number_api/env/bin/python3 /opt/apps/e_number_api/src/manage.py migrate"
   run_once: true  
 
 - name: Collect static 
-  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/enumapi/src/manage.py collectstatic --noinput"
+  command: "/opt/apps/e_number_api/env/bin/python3 /opt/apps/e_number_api/src/manage.py collectstatic --noinput"
   run_once: true
 
 - name: Create uWSGI config
   file:
-    path: /etc/uwsgi/vassals/enumapi.ini
+    path: /etc/uwsgi/vassals/e_number_api.ini
     src: /etc/uwsgi/vassals/app.skel
     state: link
 
@@ -89,4 +89,4 @@
     state: reloaded
     
 - name: Reload vassal
-  command: "touch --no-dereference /etc/uwsgi/vassals/enumapi.ini"
+  command: "touch --no-dereference /etc/uwsgi/vassals/e_number_api.ini"

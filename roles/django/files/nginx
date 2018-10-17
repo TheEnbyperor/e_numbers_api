@@ -23,6 +23,6 @@ server {
 
     location / {
         include uwsgi_params;
-        uwsgi_pass unix:///run/uwsgi/enumapi.sock;
+        uwsgi_pass unix:///run/uwsgi/e_number_api.sock;
     }
 }
