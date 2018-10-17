@@ -72,16 +72,16 @@
     path: /etc/uwsgi/vassals/enumapi.ini
     src: /etc/uwsgi/vassals/app.skel
     state: link
-    
-- name: Create nginx config
-  copy:
-    src: files/nginx
-    dest: /etc/nginx/sites-enabled/enumapi
 
 - name: Issue certificates
   shell: "certbot -m {{ letsencrypt_email }} --agree-tos --nginx -d enumapi.misell.cymru -n certonly"
   args:
     creates: /etc/letsencrypt/live/enumapi.misell.cymru
+    
+- name: Create nginx config
+  copy:
+    src: files/nginx
+    dest: /etc/nginx/sites-enabled/enumapi
     
 - name: Reload nginx
   service:
