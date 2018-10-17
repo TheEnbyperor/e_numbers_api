@@ -6,7 +6,7 @@ from . import models
 
 class SubstanceType(DjangoObjectType):
     class Meta:
-        model = models.SubCategory
+        model = models.Substance
         interfaces = (graphene.relay.Node, )
 
 
@@ -22,7 +22,7 @@ class SubCategoryType(DjangoObjectType):
 
 
 class CategoryType(DjangoObjectType):
-    sub_categories = graphene.NonNull(graphene.List(graphene.NonNull(SubstanceType)))
+    sub_categories = graphene.NonNull(graphene.List(graphene.NonNull(SubCategoryType)))
 
     class Meta:
         model = models.Category
@@ -34,8 +34,8 @@ class CategoryType(DjangoObjectType):
 
 class Query():
     categories = graphene.NonNull(graphene.List(graphene.NonNull(CategoryType)))
-    sub_categories = graphene.NonNull(graphene.List(SubCategoryType), category=graphene.ID)
-    substances = graphene.NonNull(graphene.List(SubstanceType), category=graphene.ID, sub_category=graphene.ID)
+    sub_categories = graphene.NonNull(graphene.List(SubCategoryType), category=graphene.ID())
+    substances = graphene.NonNull(graphene.List(SubstanceType), category=graphene.ID(), sub_category=graphene.ID())
 
     def resolve_categories(self, info):
         return models.Category.objects.all()
