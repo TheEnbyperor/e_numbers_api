@@ -1,0 +1,4 @@
+django
+mysqlclient
+graphene-django>=2.0
+
