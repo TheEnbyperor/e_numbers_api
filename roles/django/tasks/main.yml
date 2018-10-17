@@ -60,11 +60,11 @@
   run_once: true
 
 - name: Migrate database
-  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/chf_website/src/manage.py migrate"
+  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/enumapi/src/manage.py migrate"
   run_once: true  
 
 - name: Collect static 
-  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/chf_website/src/manage.py collectstatic --noinput"
+  command: "/opt/apps/enumapi/env/bin/python3 /opt/apps/enumapi/src/manage.py collectstatic --noinput"
   run_once: true
 
 - name: Create uWSGI config
